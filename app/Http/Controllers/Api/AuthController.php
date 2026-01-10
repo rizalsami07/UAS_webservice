@@ -10,9 +10,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    // =====================
     // REGISTER
-    // =====================
     public function register(Request $request)
     {
         $request->validate([
@@ -33,17 +31,15 @@ class AuthController extends Controller
             'message' => 'Register berhasil',
             'token' => $token,
             'user' => $user
-        ], 201);
+        ]);
     }
 
-    // =====================
     // LOGIN
-    // =====================
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
         if (! $token = JWTAuth::attempt($credentials)) {
@@ -59,19 +55,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // =====================
-    // ME (CEK TOKEN)
-    // =====================
-    public function me()
-    {
-        return response()->json([
-            'user' => auth()->user()
-        ]);
-    }
-
-    // =====================
     // LOGOUT
-    // =====================
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
@@ -79,5 +63,19 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logout berhasil'
         ]);
+    }
+
+    // REFRESH TOKEN
+    public function refresh()
+    {
+        return response()->json([
+            'token' => JWTAuth::refresh(JWTAuth::getToken())
+        ]);
+    }
+
+    // USER LOGIN
+    public function me()
+    {
+        return response()->json(auth()->user());
     }
 }

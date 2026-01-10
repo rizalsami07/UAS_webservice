@@ -10,10 +10,9 @@ class Reservation extends Model
         'user_id',
         'service_id',
         'reservation_date',
-        'status',
+        'status'
     ];
 
-    // RELATION
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -24,4 +23,3 @@ class Reservation extends Model
         return $this->belongsTo(Service::class);
     }
 }
-    

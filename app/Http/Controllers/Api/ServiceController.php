@@ -8,45 +8,77 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    // GET /api/services
+    // =====================
+    // GET ALL SERVICES
+    // =====================
     public function index()
     {
-        return response()->json(Service::all());
+        $services = Service::all();
+
+        return response()->json([
+            'message' => 'List service',
+            'data' => $services
+        ]);
     }
 
-    // POST /api/services
+    // =====================
+    // CREATE SERVICE
+    // =====================
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric'
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0'
         ]);
 
-        $service = Service::create($request->all());
+        $service = Service::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price
+        ]);
 
         return response()->json([
-            'message' => 'Service berhasil ditambahkan',
+            'message' => 'Service berhasil dibuat',
             'data' => $service
         ], 201);
     }
 
-    // GET /api/services/{id}
+    // =====================
+    // SHOW SERVICE BY ID
+    // =====================
     public function show($id)
     {
-        $service = Service::findOrFail($id);
-        return response()->json($service);
+        $service = Service::find($id);
+
+        if (! $service) {
+            return response()->json([
+                'message' => 'Service tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $service
+        ]);
     }
 
-    // PUT /api/services/{id}
+    // =====================
+    // UPDATE SERVICE
+    // =====================
     public function update(Request $request, $id)
     {
-        $service = Service::findOrFail($id);
+        $service = Service::find($id);
+
+        if (! $service) {
+            return response()->json([
+                'message' => 'Service tidak ditemukan'
+            ], 404);
+        }
 
         $request->validate([
             'name' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric'
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0'
         ]);
 
         $service->update($request->all());
@@ -57,10 +89,19 @@ class ServiceController extends Controller
         ]);
     }
 
-    // DELETE /api/services/{id}
+    // =====================
+    // DELETE SERVICE
+    // =====================
     public function destroy($id)
     {
-        $service = Service::findOrFail($id);
+        $service = Service::find($id);
+
+        if (! $service) {
+            return response()->json([
+                'message' => 'Service tidak ditemukan'
+            ], 404);
+        }
+
         $service->delete();
 
         return response()->json([
@@ -68,4 +109,3 @@ class ServiceController extends Controller
         ]);
     }
 }
-    

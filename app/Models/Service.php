@@ -15,6 +15,7 @@ class Service extends Model
         'price'
     ];
 
+    // Relasi ke reservations
     public function reservations()
     {
         return $this->hasMany(Reservation::class);

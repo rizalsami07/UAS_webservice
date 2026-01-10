@@ -10,9 +10,7 @@ class ReservationController extends Controller
 {
     public function index()
     {
-        return response()->json(
-            Reservation::with(['user', 'service'])->get()
-        );
+        return Reservation::with('service')->where('user_id', auth()->id())->get();
     }
 
     public function store(Request $request)
@@ -20,51 +18,45 @@ class ReservationController extends Controller
         $request->validate([
             'service_id' => 'required|exists:services,id',
             'reservation_date' => 'required|date',
-            'status' => 'in:pending,confirmed,cancelled'
         ]);
 
         $reservation = Reservation::create([
             'user_id' => auth()->id(),
             'service_id' => $request->service_id,
             'reservation_date' => $request->reservation_date,
-            'status' => $request->status ?? 'pending'
+            'status' => 'pending',
         ]);
 
         return response()->json([
-            'message' => 'Reservasi berhasil dibuat',
+            'message' => 'Reservation berhasil',
             'data' => $reservation
-        ], 201);
+        ]);
     }
 
     public function show($id)
     {
-        return response()->json(
-            Reservation::with(['user', 'service'])->findOrFail($id)
-        );
+        return Reservation::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
     }
 
     public function update(Request $request, $id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
-        $reservation->update($request->only([
-            'service_id',
-            'reservation_date',
-            'status'
-        ]));
+        $reservation->update($request->only('reservation_date', 'status'));
 
-        return response()->json([
-            'message' => 'Reservasi berhasil diupdate',
-            'data' => $reservation
-        ]);
+        return response()->json($reservation);
     }
 
     public function destroy($id)
     {
-        Reservation::findOrFail($id)->delete();
+        Reservation::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->delete();
 
-        return response()->json([
-            'message' => 'Reservasi berhasil dihapus'
-        ]);
+        return response()->json(['message' => 'Reservation dihapus']);
     }
 }
