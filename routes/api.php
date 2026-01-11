@@ -1,34 +1,41 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ReservationController;
 
 /*
 |--------------------------------------------------------------------------
-| AUTH (PUBLIC)
+| API Routes
 |--------------------------------------------------------------------------
 */
+
+// =====================
+// AUTH (TANPA TOKEN)
+// =====================
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-/*
-|--------------------------------------------------------------------------
-| AUTH (JWT)
-|--------------------------------------------------------------------------
-*/
+// =====================
+// AUTH (PAKAI TOKEN)
+// =====================
 Route::middleware('auth:api')->group(function () {
 
+    // auth
+    Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::get('/me', [AuthController::class, 'me']);
 
-    // SERVICES
-    Route::get('/services', [ServiceController::class, 'index']);
-    Route::post('/services', [ServiceController::class, 'store']);
+    // =====================
+    // SERVICE (CRUD)
+    // =====================
+    Route::apiResource('services', ServiceController::class);
 
-    // RESERVATIONS
-    Route::get('/reservations', [ReservationController::class, 'index']);
-    Route::post('/reservations', [ReservationController::class, 'store']);
+    // =====================
+    // RESERVATION (CRUD)
+    // =====================
+    Route::apiResource('reservations', ReservationController::class);
 });
